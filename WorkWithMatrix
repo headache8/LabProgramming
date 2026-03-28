@@ -1,0 +1,172 @@
+#include<stdio.h>
+#include<locale.h>
+#include<stdlib.h>
+#include<time.h>
+#include<stdbool.h>
+#define MAX_SIZE 100
+
+// Заполняет массив arr[][] значениями,у котрого string-строк и column-столбцов  , введёнными пользователем с клавиатуры. Побочное эффект: изменяет массив
+void KeyBoardInput(double arr[MAX_SIZE][MAX_SIZE],  int string, int column)
+{
+	for ( int i = 0; i < string; i++) 
+	{
+		for ( int j = 0; j < column; j++)
+		{
+			printf("arr[%u][%u]= ", i, j);
+			scanf_s("%lf", &arr[i][j]);
+		}
+	}
+}
+//Заполняет массив arr[][] ,у котрого string-строк и column-столбцов, случайными числами на отрезке [A; B]. Побочное эффект: изменяет массив
+void RandomInput(double arr[MAX_SIZE][MAX_SIZE], int A, int B,  int string,  int column)
+{
+	for ( int i = 0; i < string; i++)
+	{
+		for ( int j = 0; j < column; j++)
+		{
+			arr[i][j] = rand() % (B - A + 1) + A;
+		}
+	}
+}
+
+// Считывает из файла fname  его элементы в arr[][]. Побочное эффект: изменяет массив
+void FromFileInput(double arr[MAX_SIZE][MAX_SIZE],  int string,  int column, const char* fname)
+{
+	FILE* f = fopen(fname, "r");
+	if (f == NULL) 
+	{ 
+		printf("Ошибка: невозможно открыть файл %s\n", fname);
+		return; 
+	}
+	
+
+	for ( int i = 0; i < string; i++)
+	{
+		for ( int j = 0; j < column; j++)
+		{
+			fscanf_s(f, "%lf", &arr[i][j]);
+		}
+	}
+	printf("Массив успешно считан из файла '%s'.\n", fname);
+	fclose(f); 
+}
+//Заполняет массив arr[][] ,у котрого string-строк и column-столбцов,значениями ,которое высчитываются по формуле.Побочный эффект: изменяет массив
+void FormuleInput(double arr[MAX_SIZE][MAX_SIZE], int string, int column)
+{
+	for (int i = 0; i < string; i++)
+	{
+		for (int j = 0; j < column; j++)
+		{
+			if (i > j)
+			{
+				arr[i][j] = i; 
+			}
+			else if (i == j)
+			{
+				arr[i][j] = 1; 
+			}
+			else 
+			{
+				arr[i][j] = (double)i / j; 
+			}
+		}
+	}
+	printf("Массив успешно заполнен по формуле.\n");
+}
+
+
+// Выводит массив arr[][] ,у котрого string-строк и column-столбцов, в консоль.
+void PrintArray(double arr[MAX_SIZE][MAX_SIZE],  int string,  int column)
+{
+	for ( int i = 0; i < string; i++)
+	{
+		for ( int j = 0; j < column; j++)
+		{
+			printf("%8.2lf ",arr[i][j]); 
+		}
+		printf("\n"); 
+	}
+}
+//Массив arr[][] ,у котрого string-строк и column-столбцов,записыается в файл *newfname. Побочное эффект: записывает в файл
+void FileOutput(double arr[MAX_SIZE][MAX_SIZE],  int string,  int column, const char* newfname)
+{
+	FILE* f = fopen(newfname, "w+");
+	if (f == NULL) 
+	{ 
+		printf("Ошибка: невозможно открыть файл %s для записи\n", newfname);
+		return; 
+	}
+	for ( int i = 0; i < string; i++)
+	{
+		for ( int j = 0; j < column; j++)
+		{
+			fprintf(f, "%8.2lf ", arr[i][j]); 
+		}
+		fprintf(f, "\n"); 
+	}
+	printf("Массив успешно записан в файл '%s'.\n", newfname);
+	fclose(f); 
+}
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+	srand((int)time(NULL)); 
+	 int string, column; 
+	int A, B; 
+	double arr[MAX_SIZE][MAX_SIZE];
+	char fname[100];
+	char newfname[100];
+
+	
+	printf("Предварительно введите кол-во строк и столбцов массива(пример 5 5): ");
+	scanf_s("%u %u", &string, &column);
+
+	
+
+	printf("Меню\n");
+	printf("Какой способ заполнения массива вы хотите?\n");
+	printf("1-с клавиатуры\n"); printf("2-случайными числами\n");
+	printf("3-с файла\n"); printf("4-по формуле\n");
+	printf("5-вывод массива на экран\n"); printf("6-вывод массива в текстовый файл\n");
+	printf("0-завершение работы\n");
+
+	int vibor; 
+	while (true)
+	{
+		printf("Ваш выбор: "); scanf_s("%d", &vibor);
+		switch (vibor)
+		{
+		case 0:
+			printf("Завершение работы!\n");
+			return 0; 
+		case 1:
+			KeyBoardInput(arr, string, column);
+			break;
+		case 2:
+			printf("Введите диапозон заполнения([A;B]): ");
+			scanf_s("%d %d", &A, &B);
+			RandomInput(arr, A, B, string, column);
+			break; 
+		case 3:
+			printf("Введите полное имя файла: ");
+			scanf_s("%99s", fname, (unsigned)_countof(fname)); 
+			FromFileInput(arr, string, column, fname);
+			break; 
+		case 4:
+			FormuleInput(arr, string, column);
+			break; 
+		case 5:
+			PrintArray(arr, string, column);
+			break; 
+		case 6:
+			printf("Введите полное имя файла куда сохранять массив: ");
+			scanf_s("%99s", newfname, (unsigned)_countof(newfname)); 
+			FileOutput(arr, string, column, newfname);
+			break; 
+		default:
+			printf("такой операции нет!\n");
+			break; 
+		}
+	}
+}
