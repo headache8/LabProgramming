@@ -1,0 +1,167 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <locale.h>
+#include <math.h>
+#include <float.h> 
+struct Section
+{
+	int x1, x2, y1, y2;
+};
+
+// Функция берет указатель на *sections и размер массива структур n. Побочное действие: изменяет элементы структур.
+void InputSectionCoordinates(struct Section* sections, int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		printf("Введите координаты начала %d-го отрезка:\n", i + 1);
+		printf("x="); scanf_s("%d", &sections[i].x1);
+		printf("y="); scanf_s("%d", &sections[i].y1);
+		printf("Введите координаты конца %d-го отрезка:\n", i + 1);
+		printf("x="); scanf_s("%d", &sections[i].x2);
+		printf("y="); scanf_s("%d", &sections[i].y2);
+	}
+}
+
+// Функция берет указатель на *sections, размер массива структур n и имя файла file_name. Побочное действие: изменяет элементы структур.
+void FromTextFile(struct Section* sections, int n, const char file_name[])
+{
+	FILE* p = fopen(file_name, "r");
+	if (p == NULL)
+	{
+		printf("Ошибка чтения файла\n");
+		return;
+	}
+	for (int i = 0; i < n; i++)
+	{
+		
+		fscanf_s(p, "%d", &sections[i].x1);
+		fscanf_s(p, "%d", &sections[i].y1);
+		fscanf_s(p, "%d", &sections[i].x2);
+		fscanf_s(p, "%d", &sections[i].y2);
+	}
+	fclose(p);
+	printf("Данные успешно загружены из файла %s\n", file_name);
+}
+
+// Функция берет указатель на одну структуру Section. Побочное действие: выводит координаты отрезка на экран.
+void Printer(struct Section* sections)
+{
+	printf("Координаты отрезка:\n");
+	printf("x1=%d ", sections->x1);
+	printf("y1=%d\n", sections->y1);
+	printf("x2=%d ", sections->x2);
+	printf("y2=%d\n", sections->y2);
+}
+
+// Функция берет указатель на массив структур s, размер массива n и начальное значение max. Побочное действие: выводит координаты самого длинного отрезка. Возвращает длину самого длинного отрезка.
+double TaskSearchMax(struct Section* s, int n, double max)
+{
+	double L;
+	int i1 = 0;  // Инициализируем индекс, чтобы избежать неопределённого поведения
+	for (int i = 0; i < n; i++)
+	{
+		L = sqrt((double)(s[i].x2 - s[i].x1) * (s[i].x2 - s[i].x1) +
+			(double)(s[i].y2 - s[i].y1) * (s[i].y2 - s[i].y1));
+		if (L > max)
+		{
+			max = L;
+			i1 = i;
+		}
+	}
+	Printer(&s[i1]);
+	return max;
+}
+
+// Функция берет указатель на массив структур s, размер массива n и начальное значение min. Побочное действие: выводит координаты самого короткого отрезка. Возвращает длину самого короткого отрезка.
+double TaskSearchMin(struct Section* s, int n, double min)
+{
+	double L;
+	int i1 = 0;  
+	for (int i = 0; i < n; i++)
+	{
+		L = sqrt((double)(s[i].x2 - s[i].x1) * (s[i].x2 - s[i].x1) +
+			(double)(s[i].y2 - s[i].y1) * (s[i].y2 - s[i].y1));
+		if (L < min)
+		{
+			min = L;
+			i1 = i;
+		}
+	}
+	Printer(&s[i1]);
+	return min;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+	char file_name[100];
+	int n, choice = 1;
+
+	printf("Кол-во отрезков: ");
+	scanf_s("%d", &n);
+
+	// Проверка корректности ввода количества отрезков
+	if (n <= 0 || n > 100)
+	{
+		printf("Ошибка: количество отрезков должно быть от 1 до 100\n");
+		return 1;
+	}
+
+	struct Section sections[100];
+
+	while (choice != 0)
+	{
+		printf("\nКакой способ заполнения вы хотите?\n");
+		printf("1 - ввод с клавиатуры\n");
+		printf("2 - загрузка из текстового файла\n");
+		printf("3 - найти самый короткий и самый длинный отрезки\n");
+		printf("4 - завершить работу\n");
+		printf("Ваш выбор: ");
+		scanf_s("%d", &choice);
+
+		switch (choice)
+		{
+		case 1:
+		{
+			InputSectionCoordinates(sections, n);
+			printf("Данные успешно введены с клавиатуры\n");
+			break;
+		}
+		case 2:
+		{
+			printf("Введите название файла (в формате file.txt): ");
+			scanf_s("%s", file_name, 100);
+			FromTextFile(sections, n, file_name);
+			break;
+		}
+		case 3:
+		{
+			
+			double max = -1.0;      
+			double min = DBL_MAX;   // Максимально возможное значение для поиска минимума
+
+			printf("\n--- Самый короткий отрезок ---\n");
+			double min_length = TaskSearchMin(sections, n, min);
+			printf("Длина: %.2lf\n", min_length);
+
+			printf("\n--- Самый длинный отрезок ---\n");
+			double max_length = TaskSearchMax(sections, n, max);
+			printf("Длина: %.2lf\n", max_length);
+			break;
+		}
+		case 4:
+		{
+			choice = 0;
+			printf("Работа программы завершена.\n");
+			break;
+		}
+		default:
+		{
+			printf("Неверный выбор. Пожалуйста, введите число от 1 до 4.\n");
+			break;
+		}
+		}
+	}
+
+	return 0;
+}
