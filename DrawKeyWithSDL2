@@ -1,0 +1,143 @@
+#include<SDL.h>
+#include<stdio.h>
+#include<locale.h>
+
+#define WIDTH 800
+#define HEIGHT 600
+
+
+
+void DrawKey(SDL_Renderer *renderer, int x , int y)
+{
+
+	SDL_SetRenderDrawColor(renderer, 110, 110, 192, 0);
+	SDL_Rect rect1 = { x,y,90,100 };
+	SDL_RenderFillRect(renderer, &rect1);
+	SDL_Rect rect2 = { x + 90,y + 40,215,20 };
+
+	SDL_SetRenderDrawColor(renderer, 255, 215, 0, 0);
+	//Рисование верхних зубцов
+	SDL_RenderFillRect(renderer, &rect2);
+	SDL_Rect rectZub1Up = { x + 90 + 140,y + 25,10,15 };
+	SDL_RenderFillRect(renderer, &rectZub1Up);
+	SDL_Rect rectZub2Up = { x + 90 + 150,y + 30,15,10 };
+	SDL_RenderFillRect(renderer, &rectZub2Up);
+	SDL_Rect rectZub3Up = { x + 90 + 165,y + 10,12,30 };
+	SDL_RenderFillRect(renderer, &rectZub3Up);
+	SDL_Rect rectZub4Up = { x + 90 + 177,y + 15,12,25 };
+	SDL_RenderFillRect(renderer, &rectZub4Up);
+	SDL_Rect rectZub5Up = { x + 90 + 189,y + 25,12,15 };
+	SDL_RenderFillRect(renderer, &rectZub5Up);
+	
+	//Рисование нижних зубцов
+	SDL_Rect rectZub1Down = { x + 90 + 140,y + 60,10,22 };
+	SDL_RenderFillRect(renderer, &rectZub1Down);
+	SDL_Rect rectZub2Down = { x + 90 + 150,y + 60,15,15 };
+	SDL_RenderFillRect(renderer, &rectZub2Down);
+	SDL_Rect rectZub3Down = { x + 90 + 165,y + 60,12,30 };
+	SDL_RenderFillRect(renderer, &rectZub3Down);
+	SDL_Rect rectZub4Down = { x + 90 + 177,y + 60,12,10 };
+	SDL_RenderFillRect(renderer, &rectZub4Down);
+	SDL_Rect rectZub5Down = { x + 90 + 189,y + 60,12,20 };
+	SDL_RenderFillRect(renderer, &rectZub5Down);
+
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	// Контур большого прямоугольника 
+	SDL_Point pointsBigRect[] = {
+		{ x,      y },
+		{ x + 90, y },
+		{ x + 90, y + 100 },
+		{ x,      y + 100 },
+		{ x,      y }
+	};
+	SDL_RenderDrawLines(renderer, pointsBigRect, 5);
+
+	// Контур стержня с зубцами
+	SDL_Point LastPoints[] = {
+		// Начало от головки
+		{ x + 90,  y + 40 },
+		// Верхняя кромка стержня
+		{ x + 230, y + 40 },
+		// Верхние зубцы
+		{ x + 230, y + 25 },
+		{ x + 240, y + 25 },
+		{ x + 240, y + 30 },
+		{ x + 255, y + 30 },
+		{ x + 255, y + 10 },
+		{ x + 267, y + 10 },
+		{ x + 267, y + 15 },
+		{ x + 279, y + 15 },
+		{ x + 279, y + 25 },
+		{ x + 291, y + 25 },
+		{ x + 291, y + 40 },
+		// Торец
+		{ x + 305, y + 40 },
+		{ x + 305, y + 60 },
+		// Нижние зубцы
+		{ x + 291, y + 60 },
+		{ x + 291, y + 80 },
+		{ x + 279, y + 80 },
+		{ x + 279, y + 70 },
+		{ x + 267, y + 70 },
+		{ x + 267, y + 90 },
+		{ x + 255, y + 90 },
+		{ x + 255, y + 75 },
+		{ x + 240, y + 75 },
+		{ x + 240, y + 82 },
+		{ x + 230, y + 82 },
+		{ x + 230, y + 60 },
+		// Нижняя кромка стержня обратно к головке
+		{ x + 90,  y + 60 }
+	};
+	SDL_RenderDrawLines(renderer, LastPoints, 28);
+}
+
+
+int main(int argc, char* argv[])
+{
+	setlocale(LC_ALL, "ru");
+	int x = 100;
+	int y = 100;
+
+	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
+	{
+		printf("Eror:%s", SDL_GetError());
+	}
+
+
+	SDL_Window* window= SDL_CreateWindow("Трепутин Илья",
+		SDL_WINDOWPOS_CENTERED,
+		SDL_WINDOWPOS_CENTERED,
+		WIDTH,
+		HEIGHT,
+		SDL_WINDOW_SHOWN);
+	if (!window)
+	{
+		printf("Error:%s", SDL_GetError());
+	}
+
+	SDL_Renderer* renderer=SDL_CreateRenderer(window, -1, 0);
+	if (!renderer)
+	{
+		printf("Error:%s", SDL_GetError());
+	}
+	SDL_SetRenderDrawColor(renderer, 150, 200, 150, 0);
+	SDL_Rect rectmain = { 0,0,WIDTH,HEIGHT };
+	SDL_RenderFillRect(renderer, &rectmain);
+
+	
+	DrawKey(renderer ,x,y);
+
+
+
+
+	SDL_RenderPresent(renderer);
+	SDL_RenderClear(renderer);
+	SDL_Delay(10000);
+
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+
+	return 0;
+}
