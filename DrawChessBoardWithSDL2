@@ -1,0 +1,97 @@
+#include<SDL.h>
+#include<stdio.h>
+#include<locale.h>
+
+
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 800
+#define SizeRect 80
+#define BORDER_Ramka 5
+
+void CreateChessBoard(SDL_Renderer *renderer,int x,int y)
+{
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			if ((i + j) % 2 == 0)
+			{
+				SDL_SetRenderDrawColor(renderer, 240, 217, 181, 0);
+			}
+			else
+			{
+				SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+			}
+			SDL_Rect rect = {x+SizeRect*i,y+SizeRect*j,SizeRect,SizeRect};
+			SDL_RenderFillRect(renderer,&rect);
+
+			//Рисование рамки
+			int boardSize = SizeRect * 8;
+			SDL_Color borderColor = { 139, 69, 19, 255 };  
+			SDL_SetRenderDrawColor(renderer, borderColor.r, borderColor.g, borderColor.b, borderColor.a);
+
+			//Верхняя граница
+			SDL_Rect topBorder = { x - BORDER_Ramka, y - BORDER_Ramka,boardSize + 2 * BORDER_Ramka, BORDER_Ramka };
+			SDL_RenderFillRect(renderer, &topBorder);
+
+			// Нижняя граница
+			SDL_Rect bottomBorder = { x - BORDER_Ramka, y + boardSize,boardSize + 2 * BORDER_Ramka, BORDER_Ramka };
+			SDL_RenderFillRect(renderer, &bottomBorder);
+
+			// Левая граница
+			SDL_Rect leftBorder = { x - BORDER_Ramka, y - BORDER_Ramka,BORDER_Ramka, boardSize + 2 * BORDER_Ramka };
+			SDL_RenderFillRect(renderer, &leftBorder);
+
+			// Правая граница
+			SDL_Rect rightBorder = { x + boardSize, y - BORDER_Ramka,BORDER_Ramka, boardSize + 2 * BORDER_Ramka };
+			SDL_RenderFillRect(renderer, &rightBorder);
+
+		}
+	}
+}
+
+int main(int argc, char* argv[])
+{
+	setlocale(LC_ALL, "ru");
+
+	int x = 60, y = 60;
+
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+		printf("Error:%s", SDL_GetError());
+	}
+
+	SDL_Window* window = SDL_CreateWindow("Шахматная доска",
+		SDL_WINDOWPOS_CENTERED,
+		SDL_WINDOWPOS_CENTERED,
+		WINDOW_WIDTH,
+		WINDOW_HEIGHT,
+		SDL_WINDOW_SHOWN);
+	if (!window)
+	{
+		printf("Error:%s", SDL_GetError());
+	}
+
+	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
+	if (!renderer)
+	{
+		printf("Error:%s", SDL_GetError());
+	}
+	SDL_RenderClear(renderer);
+
+	SDL_SetRenderDrawColor(renderer, 150, 200, 150, 0);
+	SDL_Rect rectMain = { 0,0,WINDOW_WIDTH,WINDOW_HEIGHT };
+	SDL_RenderFillRect(renderer, &rectMain);
+
+	
+
+	CreateChessBoard(renderer,x,y);
+
+	SDL_RenderPresent(renderer);
+
+	SDL_Delay(3000);
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+	return 0;
+}
